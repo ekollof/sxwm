@@ -51,3 +51,4 @@ const Binding binds[] = {
     {Mod4Mask, XK_9, {.ws = 8}, TYPE_CWKSP},
     {Mod4Mask | ShiftMask, XK_9, {.ws = 8}, TYPE_MWKSP},
 };
+

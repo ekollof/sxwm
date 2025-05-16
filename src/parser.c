@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE 200809L
+// #define _POSIX_C_SOURCE 200809L
 #include <ctype.h>
 #include <limits.h>
 #include <stdio.h>
@@ -8,6 +8,8 @@
 
 #include "parser.h"
 #include "defs.h"
+
+#define MAX_ARG_LEN 4096
 
 static const struct {
 	const char *name;
@@ -339,24 +341,31 @@ const char **build_argv(const char *cmd)
 			char *end = tok + strlen(tok) - 1;
 			if (*end == '"') {
 				*end = '\0';
-				argv[i++] = strdup(tok + 1);
+				char *arg = malloc(MAX_ARG_LEN);
+				strlcpy(arg, tok + 1, MAX_ARG_LEN);
+				argv[i++] = arg;
 			}
 			else {
-				char *quoted = strdup(tok + 1);
-				while ((tok = strtok_r(NULL, " \t", &saveptr)) && *tok != '"') {
-					quoted = realloc(quoted, strlen(quoted) + strlen(tok) + 2);
-					strcat(quoted, " ");
-					strcat(quoted, tok);
+				char *quoted = malloc(MAX_ARG_LEN);
+				quoted[0] = '\0';
+				strlcpy(quoted, tok + 1, MAX_ARG_LEN);
+				size_t len = strlen(quoted);
+
+				while ((tok = strtok_r(NULL, " \t", &saveptr)) && *tok != '"' && len < MAX_ARG_LEN - 1) {
+					strlcat(quoted, " ", MAX_ARG_LEN);
+					strlcat(quoted, tok, MAX_ARG_LEN);
+					len = strlen(quoted);
 				}
 				if (tok && *tok == '"') {
-					quoted = realloc(quoted, strlen(quoted) + strlen(tok));
-					strcat(quoted, tok);
+					strlcat(quoted, tok, MAX_ARG_LEN);
 				}
 				argv[i++] = quoted;
 			}
 		}
 		else {
-			argv[i++] = strdup(tok);
+			char *arg = malloc(MAX_ARG_LEN);
+			strlcpy(arg, tok, MAX_ARG_LEN);
+			argv[i++] = arg;
 		}
 		tok = strtok_r(NULL, " \t", &saveptr);
 	}

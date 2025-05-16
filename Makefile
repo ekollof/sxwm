@@ -1,6 +1,6 @@
-CC      ?= gcc
-CFLAGS  ?= -std=c99 -Wall -Wextra -O3 -Isrc -g
-LDFLAGS ?= -lX11 -lXinerama -lXcursor
+CC      ?= clang
+CFLAGS  ?= -std=c99 -Werror -ansi -pedantic -std=c99 -Wall -Wextra -O3 -Isrc -g -I/usr/X11R6/include
+LDFLAGS ?= -lX11 -lXinerama -lXcursor -L/usr/X11R6/lib
 
 PREFIX  ?= /usr/local
 BIN     := sxwm
